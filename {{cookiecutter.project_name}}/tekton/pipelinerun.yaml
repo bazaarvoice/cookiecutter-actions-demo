@@ -1,0 +1,32 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: {{cookiecutter.project_name}}-ga-sibad-run-
+  namespace: tekton-pipelines
+spec:
+  pipelineRef:
+    name: single-image-build-and-deploy
+  serviceAccountName: tekton-triggers-github
+  params:
+    - name: gitreponame
+      value: {{cookiecutter.project_name}}
+    - name: gitrepositoryurl
+      value: https://github.com/bazaarvoice/{{cookiecutter.project_name}}
+    - name: gitrevision
+      value: ${REVISION}
+    - name: context
+      value: ./
+    - name: dockerfile
+      value: ./Dockerfile
+    - name: extraArgs
+      value: ""
+  workspaces:
+    - name: git-source
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+

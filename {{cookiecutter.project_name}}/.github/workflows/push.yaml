@@ -1,0 +1,51 @@
+name: "Tekton Image Pipeline"
+on: [pull_request, push]
+
+env:
+  NAMESPACE: tekton-pipelines
+
+jobs:
+  tekton:
+    runs-on: [bazaarvoice, qa]
+    steps:
+    - uses: actions/checkout@master  
+    - name: Update pipelinerun.yaml
+      id: update-pipelinerun-yaml
+      uses: Slidem/inplace-envsubst-action@v1.0.0
+      env:
+        REVISION: ${{ github.sha }}
+      with:
+        working-directory: tekton
+        fail_on_missing_variables: "true"
+        search_input: |
+          {
+            "files": ["pipelinerun.yaml"],
+            "depth": 0
+          }
+    - name: Create Pipeline Run
+      id: create-pipeline-run
+      run: |
+        RUN=$(kubectl create -n ${{ env.NAMESPACE }} -f tekton/pipelinerun.yaml | awk -F'[\/ ]' '{ print $2 }')
+        echo "::set-output name=run::$(echo $RUN)"
+    - name: Wait for PipelineRun to finish
+      run: |
+        STATUS=$(kubectl -n ${{ env.NAMESPACE }} get pipelinerun ${{ steps.create-pipeline-run.outputs.run }} -o json | jq -rc .status.conditions[0].status)
+        LIMIT=$((SECONDS+180))
+        while [ "${STATUS}" != "True" ]; do
+          if [ $SECONDS -gt $LIMIT ]
+          then
+            echo "Timeout waiting for pipelinerun to complete"
+            exit 2
+          fi
+          sleep 10
+          echo "Waiting for PipelineRun to complete, follow along here: https://tekton.eu-west-1a.bosun.qa.bazaarvoice.com/#/namespaces/${{ env.NAMESPACE }}/pipelineruns/${{steps.create-pipeline-run.outputs.run }}"
+          STATUS=$(kubectl -n ${{ env.NAMESPACE }} get pipelinerun ${{ steps.create-pipeline-run.outputs.run }} -o json | jq -rc .status.conditions[0].status)
+        done
+    - name: Get PipelineRun Logs
+      run: |
+        tkn -n ${{ env.NAMESPACE }} pipelinerun logs ${{ steps.create-pipeline-run.outputs.run }} -a
+    - name: Result
+      run: |
+        REASON=$(kubectl -n ${{ env.NAMESPACE }} get pipelinerun ${{ steps.create-pipeline-run.outputs.run }} -o json | jq -rc .status.conditions[0].reason)
+        echo "The job ${REASON}"
+        test ${REASON} != "Failed"
