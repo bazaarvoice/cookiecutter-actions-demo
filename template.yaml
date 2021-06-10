@@ -57,6 +57,7 @@ spec:
           project_name: '{{ parameters.project_name }}'
           project_description: '{{ parameters.project_description }}'
           owner: '{{ parameters.owner }}'
+          destination: '{{ parseRepoUrl parameters.repoUrl }}'
 
     - id: publish
       name: Publish
