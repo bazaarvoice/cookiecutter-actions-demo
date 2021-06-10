@@ -50,13 +50,13 @@ spec:
       name: Fetch Skeleton + Template
       action: fetch:cookiecutter
       input:
-        url: ./{{cookiecutter.project_name}}
+        url: ./skeleton
         copyWithoutRender:
           - .github/workflows/*
         values:
           project_name: '{{ parameters.component_id }}'
           project_description: '{{ parameters.description }}'
-          owners: '{{ parameters.owner }}'
+          owner: '{{ parameters.owner }}'
 
     - id: publish
       name: Publish
