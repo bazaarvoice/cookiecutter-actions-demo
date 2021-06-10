@@ -1,8 +1,0 @@
-{
-    "project_name": "actions-demo",
-    "project_description": "GitHub Actions CookieCutter Demo",
-    "owner": "infrastructure-dev@bazaarvoice.com",
-    "_copy_without_render": [
-        ".github/workflows/push.yaml"
-    ]
-}
