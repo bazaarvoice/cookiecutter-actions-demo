@@ -14,14 +14,14 @@ spec:
   parameters:
     - title: Provide some simple information
       required:
-        - component_id
+        - project_name
         - owner
       properties:
-        component_id:
+        project_name:
           title: Name
           type: string
           description: Unique name of the component
-        description:
+        project_description:
           title: Description
           type: string
           description: Help others understand what this service is for.
@@ -54,8 +54,8 @@ spec:
         copyWithoutRender:
           - .github/workflows/*
         values:
-          project_name: '{{ parameters.component_id }}'
-          project_description: '{{ parameters.description }}'
+          project_name: '{{ parameters.project_name }}'
+          project_description: '{{ parameters.project_description }}'
           owner: '{{ parameters.owner }}'
 
     - id: publish
@@ -63,7 +63,7 @@ spec:
       action: publish:github
       input:
         allowedHosts: ['github.com']
-        description: 'This is {{ parameters.component_id }}'
+        description: 'This is {{ parameters.project_name }}'
         repoUrl: '{{ parameters.repoUrl }}'
 
     - id: register
