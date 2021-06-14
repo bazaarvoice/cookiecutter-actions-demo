@@ -72,7 +72,7 @@ spec:
         description: 'This is {{ parameters.project_name }}'
         repoUrl: '{{ parameters.repoUrl }}'
         collaborators:
-          - username: {{parameters.repoAdmin}}
+          - username: '{{parameters.repoAdmin}}'
             access: admin
 
     - id: register
