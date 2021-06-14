@@ -1,0 +1,87 @@
+apiVersion: backstage.io/v1beta2
+kind: Template
+metadata:
+  name: go-template
+  title: Go Template
+  description: Create a simple microservice using Go
+  tags:
+    - go
+    - tekton
+spec:
+  owner: platform-infrastructure
+  type: service
+  
+  parameters:
+    - title: Provide some simple information
+      required:
+        - project_name
+        - owner
+      properties:
+        project_name:
+          title: Name
+          type: string
+          description: Unique name of the component
+        project_description:
+          title: Description
+          type: string
+          description: Help others understand what this service is for.
+        owner:
+          title: Owner
+          type: string
+          description: Owner of the component
+          ui:field: OwnerPicker
+          ui:options:
+            allowedKinds: 
+              - Group
+    - title: Choose a location  
+      required:
+        - repoUrl
+        - repoAdmin
+      properties: 
+        repoUrl:
+          title: Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+        repoAdmin:
+          title: Admin group
+          type: string
+          description: Existing Bazaarvoice Github group that will be granted admin access to the repository
+
+  steps:
+    - id: template
+      name: Fetch Skeleton + Template
+      action: fetch:cookiecutter
+      input:
+        url: ./{{cookiecutter.project_name}}
+        copyWithoutRender:
+          - .github/workflows/*
+        values:
+          project_name: '{{ parameters.project_name }}'
+          project_description: '{{ parameters.project_description }}'
+          owner: '{{ parameters.owner }}'
+          destination: '{{ parseRepoUrl parameters.repoUrl }}'
+
+    - id: publish
+      name: Publish
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        description: 'This is {{ parameters.project_name }}'
+        repoUrl: '{{ parameters.repoUrl }}'
+        collaborators:
+          - username: '{{parameters.repoAdmin}}'
+            access: admin
+
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: '{{ steps.publish.output.repoContentsUrl }}'
+        catalogInfoPath: '/catalog-info.yaml'
+
+  output:
+    remoteUrl: '{{ steps.publish.output.remoteUrl }}'
+    entityRef: '{{ steps.register.output.entityRef }}'

@@ -10,7 +10,7 @@ Run cookiecutter, pass it the URL for this repo and answer the three questions..
 $ cookiecutter https://github.com/bazaarvoice/cookiecutter-actions-demo
 project_name [actions-demo]:
 project_description [GitHub Actions CookieCutter Demo]:
-owners [infrastructure-dev@bazaarvoice.com]:
+owner [infrastructure-dev@bazaarvoice.com]:
 ```
 
 This will generate a directory called your `project_name` and populate it with "all the things" including GitHub Actions Workflow, a Dockerfile, a Tekton PipelineRun and some Terraform to create a GitHub repository with some permissions. 
