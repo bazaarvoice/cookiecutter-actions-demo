@@ -36,6 +36,7 @@ spec:
     - title: Choose a location  
       required:
         - repoUrl
+        - repoAdmin
       properties: 
         repoUrl:
           title: Repository Location
@@ -44,6 +45,10 @@ spec:
           ui:options:
             allowedHosts:
               - github.com
+        repoAdmin:
+          title: Admin group/user
+          type: string
+          description: Github username or group that will be granted admin access to the repository
 
   steps:
     - id: template
@@ -66,6 +71,9 @@ spec:
         allowedHosts: ['github.com']
         description: 'This is {{ parameters.project_name }}'
         repoUrl: '{{ parameters.repoUrl }}'
+        collaborators:
+          - username: {{}}
+            access: admin
 
     - id: register
       name: Register
