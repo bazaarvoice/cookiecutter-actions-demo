@@ -46,16 +46,16 @@ spec:
             allowedHosts:
               - github.com
         repoAdmin:
-          title: Admin group/user
+          title: Admin group
           type: string
-          description: Github username or group that will be granted admin access to the repository
+          description: Existing Bazaarvoice Github group that will be granted admin access to the repository
 
   steps:
     - id: template
       name: Fetch Skeleton + Template
       action: fetch:cookiecutter
       input:
-        url: ./skeleton
+        url: ./{{cookiecutter.project_name}}
         copyWithoutRender:
           - .github/workflows/*
         values:
