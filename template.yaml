@@ -33,11 +33,11 @@ spec:
           ui:options:
             allowedKinds: 
               - Group
-    - title: Choose a location  
+    - title: Github repository details
       required:
         - repoUrl
         - repoAdmin
-      properties: 
+      properties:
         repoUrl:
           title: Repository Location
           type: string
@@ -55,7 +55,7 @@ spec:
       name: Fetch Skeleton + Template
       action: fetch:cookiecutter
       input:
-        url: ./{{cookiecutter.project_name}}
+        url: ./skeleton
         copyWithoutRender:
           - .github/workflows/*
         values:
